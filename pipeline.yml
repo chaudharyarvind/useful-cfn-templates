@@ -245,6 +245,7 @@ Resources:
                   - iam:*
                   - autoscaling:*
                   - application-autoscaling:*
+                  - cloudwatch:*
                 Effect: Allow
                 Resource: '*'
               
