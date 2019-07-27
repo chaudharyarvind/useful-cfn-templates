@@ -48,13 +48,28 @@ Resources:
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
+      ArtifactStore:
+        Location: !Ref 'S3Bucket'
+        Type: S3
       DisableInboundStageTransitions: []
       Name: !Ref 'PipelineName'
       RoleArn: !GetAtt [PipelineRole, Arn]
       Stages:
-        - Name: S3Source
+        - Name: Source
           Actions:
-            - Name: TemplateSource
+            - Name: ECRSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: ECR
+                Version: '1'
+              Configuration:
+                ImageTag: latest
+                RepositoryName: ecs-test
+              OutputArtifacts:
+                - Name: ContainerSource
+              RunOrder: '1'
+            - Name: S3Source
               ActionTypeId:
                 Category: Source
                 Owner: AWS
@@ -75,6 +90,7 @@ Resources:
                 Provider: CloudFormation
                 Version: '1'
               InputArtifacts:
+                - Name: ContainerSource
                 - Name: TemplateSource
               Configuration:
                 ActionMode: REPLACE_ON_FAILURE
@@ -114,6 +130,7 @@ Resources:
                 Version: '1'
               InputArtifacts:
                 - Name: TemplateSource
+                - Name: ContainerSource
               Configuration:
                 ActionMode: CHANGE_SET_REPLACE
                 RoleArn: !GetAtt [CFNRole, Arn]

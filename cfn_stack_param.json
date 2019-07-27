@@ -1,0 +1,30 @@
+[
+  {
+  "ParameterKey": "ApplicationName",
+  "ParameterValue": "lb"
+  },
+  {
+  "ParameterKey": "DesiredCapacity",
+  "ParameterValue": "1"
+  },
+  {
+  "ParameterKey": "EcsSecurityGroup",
+  "ParameterValue": "sg-0ad0632adf1198270"
+  },
+  {
+  "ParameterKey": "InstanceType",
+  "ParameterValue": "t2.micro"
+  },
+  {
+  "ParameterKey": "MaxSize",
+  "ParameterValue": "1"
+  },
+  {
+  "ParameterKey": "SubnetId",
+  "ParameterValue": "subnet-0009d2a714e26daeb,subnet-07a6eb58401331c3d"
+  }
+  {
+  "ParameterKey": "VpcId",
+  "ParameterValue": "vpc-0526b2e3a3458fcff"
+  }
+]i
