@@ -1,0 +1,14 @@
+{
+  "Parameters": {
+    "ChangeSetName": "UpdatePreview-MyWordPressSite",
+    "Email": "CHAUDHARY.ARVIND24@GMAIL.COM",
+    "PipelineName": "ecs-code-pipeline",
+    "ProdStackConfig": "artifacts/cfn_stack_param.json",
+    "ProdStackName": "Prod-MyWordPressSite",
+    "S3Bucket": "ecs-test-arvind",
+    "SourceS3Key": "template/artifacts.zip",
+    "TemplateFileName": "artifacts/ecs-cluster.yml",
+    "TestStackConfig": "artifacts/cfn_stack_param.json",
+    "TestStackName": "Test-MyWordPressSite"
+  }
+}

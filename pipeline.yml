@@ -69,7 +69,7 @@ Resources:
               OutputArtifacts:
                 - Name: ContainerSource
               RunOrder: '1'
-            - Name: S3Source
+            - Name: TemplateSource
               ActionTypeId:
                 Category: Source
                 Owner: AWS
@@ -81,6 +81,19 @@ Resources:
               OutputArtifacts:
                 - Name: TemplateSource
               RunOrder: '1'
+        - Name: Verify
+          Actions:
+          - Name: ValidateImageTag
+            ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+            InputArtifacts:
+              - Name: TemplateSource
+            Configuration:
+                ProjectName: !Ref ValidateTag
+            RunOrder: 1
         - Name: TestStage
           Actions:
             - Name: CreateStack
@@ -96,6 +109,7 @@ Resources:
                 ActionMode: REPLACE_ON_FAILURE
                 RoleArn: !GetAtt [CFNRole, Arn]
                 StackName: !Ref TestStackName
+                Capabilities: CAPABILITY_IAM
                 TemplateConfiguration: !Sub "TemplateSource::${TestStackConfig}"
                 TemplatePath: !Sub "TemplateSource::${TemplateFileName}"
               RunOrder: '1'
@@ -161,6 +175,52 @@ Resources:
                 RoleArn: !GetAtt [CFNRole, Arn]
                 StackName: !Ref ProdStackName
               RunOrder: '3'
+  ValidateTag:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        Type: LINUX_CONTAINER
+      Name: ValidateImageTag
+      ServiceRole: !Ref CodeBuildServiceRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+               runtime-versions:
+                    python: 3.7
+            build:
+              commands:
+                - ls -ll
+  CodeBuildServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /
+        AssumeRolePolicyDocument: |
+          {
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Principal": { "Service": [ "codebuild.amazonaws.com" ]},
+                  "Action": [ "sts:AssumeRole" ]
+              }]
+          }
+        Policies:
+          - PolicyName: root
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Resource: "*"
+                  Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    - s3:*
   CFNRole:
     Type: AWS::IAM::Role
     Properties:
@@ -178,7 +238,12 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
+                  - 'ecs:*'
                   - 'ec2:*'
+                  - logs:*
+                  - elasticloadbalancing:*
+                  - iam:*
+                  - autoscaling:*
                 Effect: Allow
                 Resource: '*'
               
@@ -211,5 +276,7 @@ Resources:
                 - 'cloudformation:SetStackPolicy'
                 - 'iam:PassRole'
                 - 'sns:Publish'
+                - 'ecr:*'
+                - 'codebuild:*'
                 Effect: Allow
                 Resource: '*'

@@ -15,3 +15,6 @@ com.amazonaws.ap-southeast-2.ecr.api
 com.amazonaws.ap-southeast-2.monitoring
 com.amazonaws.ap-southeast-2.ecs-telemetry
 
+
+https://docs.aws.amazon.com/codepipeline/latest/userguide/create-cwe-ecr-source-cfn.html
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-parameter-override-functions.html
